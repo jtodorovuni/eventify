@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import uni.fmi.eventify.R;
 import uni.fmi.eventify.databinding.ActivityLoginBinding;
+import uni.fmi.eventify.helper.SQLiteHelper;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -31,6 +32,10 @@ public class LoginActivity extends AppCompatActivity {
     EditText passwordET;
     Button loginB;
     TextView registerTV;
+
+    SQLiteHelper dbHelper;
+
+    int count = 3;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,9 +46,27 @@ public class LoginActivity extends AppCompatActivity {
         passwordET = findViewById(R.id.passwordET);
         loginB = findViewById(R.id.loginB);
         registerTV = findViewById(R.id.registerTV);
+
+        dbHelper = new SQLiteHelper(LoginActivity.this);
     }
 
-    public void onLoginClick(){
+    public void onLoginClick(View view){
+        if(usernameET.getText().length() == 0 || passwordET.getText().length() == 0){
+            Toast.makeText(this, "Please enter username and password", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        count--;
 
+        String username = usernameET.getText().toString();
+        String password = passwordET.getText().toString();
+
+        if(dbHelper.login(username, password) != null){
+            //Loging in...
+        }else{
+            Toast.makeText(this, "Invalid username or password!", Toast.LENGTH_SHORT).show();
+            if(count == 0){
+                finish();
+            }
+        }
     }
 }
