@@ -5,6 +5,7 @@ import android.app.Activity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -68,5 +69,9 @@ public class LoginActivity extends AppCompatActivity {
                 finish();
             }
         }
+    }
+
+    public void onRegisterClick(View view){
+        startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
     }
 }
