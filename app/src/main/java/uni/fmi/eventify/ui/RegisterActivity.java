@@ -69,6 +69,9 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+
+        intent.putExtra("newUser", true);
+
         intent.setFlags(FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
