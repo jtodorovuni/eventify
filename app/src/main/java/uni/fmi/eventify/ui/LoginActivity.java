@@ -5,9 +5,11 @@ import android.app.Activity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -27,9 +29,22 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import uni.fmi.eventify.R;
 import uni.fmi.eventify.databinding.ActivityLoginBinding;
 import uni.fmi.eventify.entity.User;
+import uni.fmi.eventify.helper.RequestHelper;
 import uni.fmi.eventify.helper.SQLiteHelper;
 
 public class LoginActivity extends AppCompatActivity {
@@ -71,28 +86,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(String username, String password){
-        User user = dbHelper.login(username, password);
+        //User user = dbHelper.login(username, password);
 
-        if(user != null){
-
-            if(rememberMeCB.isChecked()){
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("username", username);
-                editor.putString("password", password);
-                editor.apply();
-            }
-
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-
-            intent.putExtra("currentUser", user);
-
-            startActivity(intent);
-        }else{
-            Toast.makeText(this, "Invalid username or password!", Toast.LENGTH_SHORT).show();
-            if(count == 0){
-                finish();
-            }
-        }
+        new LoginAsyncTask(username, password).execute();
     }
 
     public void onLoginClick(View view){
@@ -104,10 +100,97 @@ public class LoginActivity extends AppCompatActivity {
 
         String username = usernameET.getText().toString();
         String password = passwordET.getText().toString();
-        login(username, password);
+        login(username, RequestHelper.hashPassword(password));
     }
 
     public void onRegisterClick(View view){
         startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+    }
+
+    private class LoginAsyncTask extends AsyncTask<Void, Void, Void>{
+
+        boolean isSuccessful;
+        String token;
+        String errorMessage;
+        String username;
+        String password;
+
+        ProgressDialog dialog;
+
+        LoginAsyncTask(String username, String password){
+            this.username = username;
+            this.password = password;
+            dialog = new ProgressDialog(LoginActivity.this);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            dialog.setTitle("Loging in...");
+            dialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            //Login?username={username}&password={password}
+
+            String urlString = String.format("%s:%s/Login?username=%s&password=%s",
+                    RequestHelper.ADDRESS, RequestHelper.PORT, username, password);
+
+            HttpURLConnection urlConnection = null;
+
+            try{
+                URL url = new URL(urlString);
+                urlConnection = (HttpURLConnection) url.openConnection();
+
+                InputStream stream = new BufferedInputStream(urlConnection.getInputStream());
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+
+                String result = reader.readLine();
+
+                if(result != null){
+
+                    JSONObject resultOb = new JSONObject(result);
+
+                    if(resultOb.getBoolean("Success")){
+                        isSuccessful = true;
+                        token = resultOb.getString("Data");
+                    }else{
+                        errorMessage = resultOb.getString("Message");
+                    }
+                }
+
+            } catch (Exception e) {
+                errorMessage = e.getMessage();
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            dialog.hide();
+
+            if(isSuccessful){
+
+                if(rememberMeCB.isChecked()){
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString("username", username);
+                    editor.putString("password", password);
+                    editor.apply();
+                }
+
+                RequestHelper.token = token;
+
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+            }else{
+                Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+
+                if(count == 0){
+                    finish();
+                }
+            }
+        }
     }
 }

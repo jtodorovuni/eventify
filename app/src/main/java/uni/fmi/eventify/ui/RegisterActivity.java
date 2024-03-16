@@ -4,15 +4,31 @@ import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import uni.fmi.eventify.R;
 import uni.fmi.eventify.entity.User;
+import uni.fmi.eventify.helper.RequestHelper;
 import uni.fmi.eventify.helper.SQLiteHelper;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -61,18 +77,89 @@ public class RegisterActivity extends AppCompatActivity {
             user.setUsername(usernameET.getText().toString());
             user.setPassword(passwordET.getText().toString());
 
-            if(!dbHelper.registers(user)){
+            new RegisterAsyncTask(user).execute();
+
+/*            if(!dbHelper.registers(user)){
                 Toast.makeText(this, "Something went caput....", Toast.LENGTH_SHORT).show();
                 return;
-            }
+            }*/
 
         }
+    }
 
-        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+    private class RegisterAsyncTask extends AsyncTask<Void, Void, Void>{
 
-        intent.putExtra("newUser", true);
+        User user;
+        boolean isSuccessful;
+        ProgressDialog dialog;
 
-        intent.setFlags(FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        String error;
+
+        RegisterAsyncTask(User user){
+            this.user = user;
+            dialog = new ProgressDialog(RegisterActivity.this);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            dialog.setTitle("Registering process is going...");
+            dialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            String urlString = String.format("%s:%s/Register?password=%s&email=%s&username=%s",
+                    RequestHelper.ADDRESS, RequestHelper.PORT, RequestHelper.hashPassword(user.getPassword()),
+                    user.getEmail(), user.getUsername());
+
+            HttpURLConnection urlConnection = null;
+
+            try{
+                URL url = new URL(urlString);
+                urlConnection = (HttpURLConnection) url.openConnection();
+
+                InputStream stream = new BufferedInputStream(urlConnection.getInputStream());
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+
+                String result = reader.readLine();
+
+                if(result != null){
+                    JSONObject jsonOb = new JSONObject(result);
+
+                    if(jsonOb.getBoolean("Success")){
+                        isSuccessful = true;
+                    }else{
+                        error = jsonOb.getString("Message");
+                    }
+
+                }else{
+                    error = "There was no response!";
+                }
+
+            }catch (IOException | JSONException e) {
+                error = e.getMessage();
+                throw new RuntimeException(e);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            dialog.hide();
+
+            if(isSuccessful){
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+
+                intent.putExtra("newUser", true);
+                intent.setFlags(FLAG_ACTIVITY_CLEAR_TOP);
+
+                startActivity(intent);
+            }else{
+                Toast.makeText(RegisterActivity.this,
+                        "Register was not successful " + error, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
