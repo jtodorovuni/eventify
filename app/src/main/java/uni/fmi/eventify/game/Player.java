@@ -8,16 +8,7 @@ import android.util.Log;
 
 import uni.fmi.eventify.R;
 
-public class Player {
-
-    Context context;
-    int maxX;
-    int maxY;
-    int x;
-    int y;
-    Bitmap skin;
-
-    Rect hitBox;//Collision Detection rectangle
+public class Player extends Unit{
 
     public Player(Context context,int sizeX,int sizeY){
         this.context = context;
