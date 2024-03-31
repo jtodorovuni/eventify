@@ -1,6 +1,8 @@
 package uni.fmi.eventify.ui.ui.home;
 
+import android.graphics.Point;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,27 +13,25 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import uni.fmi.eventify.databinding.FragmentHomeBinding;
+import uni.fmi.eventify.game.GameView;
 
 public class HomeFragment extends Fragment {
 
-    private FragmentHomeBinding binding;
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
 
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
 
-        final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-        return root;
+        Point size = new Point();
+        display.getSize(size);
+
+        GameView view = new GameView(getActivity(),size.x , size.y);
+
+        return view;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
     }
 }

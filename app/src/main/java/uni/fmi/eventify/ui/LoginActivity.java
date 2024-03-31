@@ -83,6 +83,10 @@ public class LoginActivity extends AppCompatActivity {
         if(lastUsername.length() > 0 && lastPassword.length() > 0 && !newUser){
            login(lastUsername, lastPassword);
         }
+
+
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 
     public void login(String username, String password){
