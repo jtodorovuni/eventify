@@ -7,6 +7,7 @@ public class Score {
     private int codePercent;
     private boolean isUsed;
     private int userId;
+    private long createdAt;
 
     public int getId() {
         return id;
@@ -54,5 +55,17 @@ public class Score {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getExpireDate() {
+        return "дата";
     }
 }

@@ -1,18 +1,26 @@
 package uni.fmi.eventify.game;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.VelocityTracker;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 import uni.fmi.eventify.R;
+import uni.fmi.eventify.helper.RequestHelper;
+import uni.fmi.eventify.helper.ResponseListener;
+import uni.fmi.eventify.ui.LoginActivity;
 
 public class GameView extends SurfaceView implements Runnable{
     public static int MOVEMENT = 10;
@@ -25,8 +33,11 @@ public class GameView extends SurfaceView implements Runnable{
     ArrayList<Voucher> vouchers = new ArrayList<>();
     ArrayList<Bomb> bombs = new ArrayList<>();
 
+    Context context;
+
     public GameView(Context context, int screenSizeX, int screenSizeY) {
         super(context);
+        this.context = context;
         this.screenSizeX = screenSizeX;
         this.screenSizeY = screenSizeY;
 
@@ -48,8 +59,31 @@ public class GameView extends SurfaceView implements Runnable{
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-
         }
+
+        String urlString = String.format("%s:%s/%s",
+                RequestHelper.ADDRESS,
+                RequestHelper.PORT,
+                String.format(RequestHelper.ADD_SCORE,
+                        RequestHelper.token,
+                        score));
+        RequestHelper.requestService(urlString, new ResponseListener() {
+            @Override
+            public void onResponse(String response) throws JSONException {
+                JSONObject jsonObject = new JSONObject(response);
+
+                if(jsonObject.getBoolean("LoginRequired")){
+                    context.startActivity(new Intent(context, LoginActivity.class));
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                //Add popup for error
+            }
+        });
+
+
     }
 
     private void draw() {
@@ -115,7 +149,7 @@ public class GameView extends SurfaceView implements Runnable{
                 discountPercent += voucher.value;
                 if(discountPercent > 99){
                     discountPercent = 99;
-                }else if(discountPercent < 0){
+                }else if(discountPercent <= 0){
                     lives = 0;
                 }
                 voucher.reuseItem();

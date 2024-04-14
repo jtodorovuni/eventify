@@ -5,12 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import uni.fmi.eventify.R;
@@ -38,7 +40,7 @@ public class CodeAdapter extends RecyclerView.Adapter<CodeAdapter.CodeViewHolder
     public void onBindViewHolder(@NonNull CodeViewHolder holder, int position) {
         Score score = scoreList.get(position);
 
-        holder.bind(score, position);
+        holder.bind(score);
     }
 
     @Override
@@ -46,29 +48,33 @@ public class CodeAdapter extends RecyclerView.Adapter<CodeAdapter.CodeViewHolder
         return scoreList.size();
     }
 
+    public void addAndUpdate(ArrayList<Score> allCodes) {
+        scoreList = allCodes;
+        notifyDataSetChanged();
+    }
+
     public static class CodeViewHolder extends RecyclerView.ViewHolder{
         private LinearLayout rootLayout;
-        private TextView positionTV;
+        private TextView percentTV;
         private TextView codeNameTV;
-        private TextView codePercentTV;
-        private CheckBox isUsedCB;
+        private TextView expireDateTV;
+        private ImageButton copyB;
 
 
         public CodeViewHolder(@NonNull View itemView) {
             super(itemView);
 
             rootLayout = itemView.findViewById(R.id.codeRootLL);
-            positionTV = itemView.findViewById(R.id.codePositionTV);
+            percentTV = itemView.findViewById(R.id.percentTV);
             codeNameTV = itemView.findViewById(R.id.codeNameTV);
-            codePercentTV = itemView.findViewById(R.id.codePercentTV);
-            isUsedCB = itemView.findViewById(R.id.codeUsedCB);
+            expireDateTV = itemView.findViewById(R.id.codeExpireTV);
+            copyB = itemView.findViewById(R.id.copyB);
         }
 
-        public void bind(Score score, int position){
-            positionTV.setText(position + "");
-            codePercentTV.setText(score.getCodePercent());
+        public void bind(Score score){
+            percentTV.setText(score.getCodePercent());
+            expireDateTV.setText(score.getExpireDate());
             codeNameTV.setText(score.getCode());
-            isUsedCB.setChecked(score.isUsed());
 
             if(score.isUsed()){
                 rootLayout.setBackgroundColor(Color.RED);
