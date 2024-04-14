@@ -1,5 +1,10 @@
 package uni.fmi.eventify.entity;
 
+import android.util.Log;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Score {
     private int id;
     private int score;
@@ -66,6 +71,21 @@ public class Score {
     }
 
     public String getExpireDate() {
-        return "дата";
+
+        try{
+            long dat = 3600*168*4*10;
+            dat +=  createdAt;
+
+            dat = dat * 1000;
+
+            Date date = new Date(dat);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
+            return dateFormat.format(date);
+        }catch (Exception e){
+            Log.wtf("boom", e.getMessage());
+        }
+        return "eeee";
+
     }
 }

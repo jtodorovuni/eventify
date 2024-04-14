@@ -33,4 +33,9 @@
     <string name="my_events">My Events</string>
     <string name="codes">Codes</string>
     <string name="logout">Logout</string>
+
+    <string name="date_asc">"Expire date ASC"</string>
+    <string name="date_desc">"Expire date DESC"</string>
+    <string name="percent_asc">"Percent ASC"</string>
+    <string name="percent_desc">"Percent DESC"</string>
 </resources>

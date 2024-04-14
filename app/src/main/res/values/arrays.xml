@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="coupons_sorting_options">
+        <item>@string/date_asc</item>
+        <item>@string/date_desc</item>
+        <item>@string/percent_asc</item>
+        <item>@string/percent_desc</item>
+    </string-array>
+</resources>

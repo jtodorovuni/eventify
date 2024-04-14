@@ -5,12 +5,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.TextView;
+import android.widget.CompoundButton;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,7 +23,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import uni.fmi.eventify.R;
-import uni.fmi.eventify.databinding.FragmentGalleryBinding;
 import uni.fmi.eventify.entity.Score;
 import uni.fmi.eventify.helper.RequestHelper;
 import uni.fmi.eventify.helper.ResponseListener;
@@ -30,7 +31,8 @@ import uni.fmi.eventify.ui.adapter.CodeAdapter;
 public class CodesFragment extends Fragment {
     RecyclerView codeRV;
     CodeAdapter adapter;
-    CheckBox showAllCB;
+    CheckBox showUnusedCB;
+    Spinner sortingS;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -38,33 +40,32 @@ public class CodesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_codes, container, false);
 
         codeRV = view.findViewById(R.id.codesRV);
-        showAllCB = view.findViewById(R.id.showAllCB);
+        showUnusedCB = view.findViewById(R.id.showAllCB);
+        sortingS = view.findViewById(R.id.sortingS);
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
+                getContext(),
+                R.array.coupons_sorting_options,
+                androidx.appcompat.R.layout.support_simple_spinner_dropdown_item);
+        sortingS.setAdapter(spinnerAdapter);
+
+        sortingS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                adapter.sortItems(i);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {}
+        });
 
         ArrayList<Score> score = new ArrayList<>();
-        Score newCode = new Score();
-
-        newCode.setCode("asd");
-        newCode.setCodePercent(33);
-        newCode.setCreatedAt(1312313213);
-        newCode.setUsed(false);
-        score.add(newCode);
-
-        Score newCode2 = new Score();
-
-        newCode2.setCode("asdffffff");
-        newCode2.setCodePercent(33);
-        newCode2.setCreatedAt(1312313213);
-        newCode2.setUsed(true);
-        score.add(newCode2);
-
-        adapter = new CodeAdapter(score);
+        adapter = new CodeAdapter(getContext(), score);
         codeRV.setLayoutManager(new LinearLayoutManager(getContext()));
         codeRV.setAdapter(adapter);
 
         String urlString = String.format("%s:%s/%s", RequestHelper.ADDRESS, RequestHelper.PORT,
                     String.format(RequestHelper.GET_CODES, RequestHelper.token));
 
-        /*
+
         RequestHelper.requestService(urlString, new ResponseListener() {
             @Override
             public void onResponse(String response) throws JSONException {
@@ -87,7 +88,7 @@ public class CodesFragment extends Fragment {
                     allCodes.add(newCode);
                 }
 
-                adapter.addAndUpdate(allCodes);
+                adapter.addAndUpdate(allCodes, true);
 
                 Log.wtf("response", response);
             }
@@ -97,7 +98,19 @@ public class CodesFragment extends Fragment {
 
             }
         });
-        */
+
+
+        showUnusedCB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(!b){
+                    adapter.resetList();
+                }else{
+                    adapter.showUnusedOnly();
+                }
+            }
+        });
+
 
         return view;
 
