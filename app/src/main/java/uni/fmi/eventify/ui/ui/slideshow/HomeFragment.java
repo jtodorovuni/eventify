@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import uni.fmi.eventify.databinding.FragmentSlideshowBinding;
 
-public class SlideshowFragment extends Fragment {
+public class HomeFragment extends Fragment {
 
     private FragmentSlideshowBinding binding;
 
