@@ -28,6 +28,7 @@ import java.net.URL;
 
 import uni.fmi.eventify.R;
 import uni.fmi.eventify.entity.User;
+import uni.fmi.eventify.helper.Helper;
 import uni.fmi.eventify.helper.RequestHelper;
 import uni.fmi.eventify.helper.SQLiteHelper;
 
@@ -109,7 +110,7 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             String urlString = String.format("%s:%s/Register?password=%s&email=%s&username=%s",
-                    RequestHelper.ADDRESS, RequestHelper.PORT, RequestHelper.hashPassword(user.getPassword()),
+                    RequestHelper.ADDRESS, RequestHelper.PORT, Helper.hashPassword(user.getPassword()),
                     user.getEmail(), user.getUsername());
 
             HttpURLConnection urlConnection = null;

@@ -1,4 +1,4 @@
-package uni.fmi.eventify.ui.ui.slideshow;
+package uni.fmi.eventify.ui.ui.home;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

@@ -44,6 +44,7 @@ import java.net.URL;
 import uni.fmi.eventify.R;
 import uni.fmi.eventify.databinding.ActivityLoginBinding;
 import uni.fmi.eventify.entity.User;
+import uni.fmi.eventify.helper.Helper;
 import uni.fmi.eventify.helper.RequestHelper;
 import uni.fmi.eventify.helper.SQLiteHelper;
 
@@ -104,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
 
         String username = usernameET.getText().toString();
         String password = passwordET.getText().toString();
-        login(username, RequestHelper.hashPassword(password));
+        login(username, Helper.hashPassword(password));
     }
 
     public void onRegisterClick(View view){

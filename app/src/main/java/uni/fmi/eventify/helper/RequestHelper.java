@@ -13,10 +13,11 @@ import java.security.NoSuchAlgorithmException;
 public class RequestHelper {
 
     public static final String ADD_SCORE = "AddGameScore?token=%s&score=%s";
+    public static final String GET_CODES = "GetMyCodes?token=%s";
+    public static final String GET_EVENTS = "AllEvents?token=%s";
 
     public static final String ADDRESS = "http://78.130.187.186";
     public static final String PORT = "8989";
-    public static final String GET_CODES = "GetMyCodes?token=%s";
     public static String token;
     public static void requestService(String urlString, ResponseListener listener){
         new Thread(() ->
@@ -57,26 +58,5 @@ public class RequestHelper {
     }
 
 
-    public static String hashPassword(String password){
-        try{
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
 
-            md.update(password.getBytes());
-
-            byte[] bytes = md.digest();
-
-            StringBuilder sb = new StringBuilder();
-
-            for(byte myByte : bytes){
-                sb.append(Integer.toString(
-                        (myByte & 0xff) + 0x100, 16)
-                        .substring(1));
-            }
-
-            return sb.toString();
-        }catch (NoSuchAlgorithmException e) {
-            Log.e("hashing problem...", e.getMessage());
-            return "";
-        }
-    }
 }

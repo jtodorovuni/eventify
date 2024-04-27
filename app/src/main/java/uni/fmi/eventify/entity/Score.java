@@ -85,7 +85,7 @@ public class Score {
         }catch (Exception e){
             Log.wtf("boom", e.getMessage());
         }
-        return "eeee";
+        return "error";
 
     }
 }

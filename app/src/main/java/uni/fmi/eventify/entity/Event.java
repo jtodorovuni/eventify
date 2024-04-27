@@ -1,5 +1,9 @@
 package uni.fmi.eventify.entity;
 
+import java.util.Date;
+
+import uni.fmi.eventify.helper.Helper;
+
 public class Event {
     private int id;
     private String title;
@@ -63,5 +67,9 @@ public class Event {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Date getDate(){
+        return Helper.convertLongAsDate(createdAt);
     }
 }
