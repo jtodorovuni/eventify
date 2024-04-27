@@ -1,5 +1,7 @@
 package uni.fmi.eventify.ui.ui.home;
 
+import static java.time.ZoneId.systemDefault;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,7 +27,6 @@ import java.util.Date;
 import java.util.List;
 
 import uni.fmi.eventify.R;
-import uni.fmi.eventify.databinding.FragmentSlideshowBinding;
 import uni.fmi.eventify.entity.Event;
 import uni.fmi.eventify.helper.RequestHelper;
 import uni.fmi.eventify.helper.ResponseListener;
@@ -51,9 +52,10 @@ public class HomeFragment extends Fragment {
         selectedDateTV = view.findViewById(R.id.selectedDateTV);
         eventsCalendar = view.findViewById(R.id.eventsCV);
         eventsRV = view.findViewById(R.id.eventsRV);
-        adapter = new EventAdapter(getContext(), new ArrayList<Event>());
 
-        eventsRV.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new EventAdapter(mainActivity, new ArrayList<>());
+
+        eventsRV.setLayoutManager(new LinearLayoutManager(mainActivity));
         eventsRV.setAdapter(adapter);
 
         eventsCalendar.setOnDateChangeListener(onDateChange);
@@ -93,9 +95,12 @@ public class HomeFragment extends Fragment {
                         event.setType(currentEv.getString("Type"));
                         event.setPrice(currentEv.getDouble("Price"));
                         event.setCreatedAt(currentEv.getLong("CreatedAt"));
+
                         allEvents.add(event);
                     }
                 }
+
+                updateRecyclerView(LocalDate.now());
             }
 
             @Override
@@ -121,11 +126,14 @@ public class HomeFragment extends Fragment {
         List<Event> currentEvents = new ArrayList<>();
 
         for (Event ev: allEvents) {
-           // if(ev.getDate().toInstant().compareTo().compareTo(date)){
-              //  currentEvents.add(ev);
-          //  }
+            LocalDate eventDate = ev.getDate().toInstant().atZone(systemDefault()).toLocalDate();
+
+            if(eventDate.compareTo(date) == 0){
+                currentEvents.add(ev);
+            }
         }
-       // adapter.changeEvents(currentEvents);
+
+        adapter.changeEvents(currentEvents);
     }
 
 

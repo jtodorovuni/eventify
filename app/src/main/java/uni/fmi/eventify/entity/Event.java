@@ -1,5 +1,7 @@
 package uni.fmi.eventify.entity;
 
+import android.graphics.Bitmap;
+
 import java.util.Date;
 
 import uni.fmi.eventify.helper.Helper;
@@ -12,6 +14,7 @@ public class Event {
     private String address;
     private long createdAt;
     private String type;
+    private Bitmap image;
 
     public int getId() {
         return id;
@@ -71,5 +74,13 @@ public class Event {
 
     public Date getDate(){
         return Helper.convertLongAsDate(createdAt);
+    }
+
+    public Bitmap getImage() {
+        return image;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
     }
 }

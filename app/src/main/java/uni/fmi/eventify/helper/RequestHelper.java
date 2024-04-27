@@ -15,7 +15,7 @@ public class RequestHelper {
     public static final String ADD_SCORE = "AddGameScore?token=%s&score=%s";
     public static final String GET_CODES = "GetMyCodes?token=%s";
     public static final String GET_EVENTS = "AllEvents?token=%s";
-
+    public static final String GET_EVENT_BY_ID = "EventInfo?token=%s&eventId=%s";
     public static final String ADDRESS = "http://78.130.187.186";
     public static final String PORT = "8989";
     public static String token;

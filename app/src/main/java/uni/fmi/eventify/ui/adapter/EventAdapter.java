@@ -1,5 +1,6 @@
 package uni.fmi.eventify.ui.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -15,14 +17,16 @@ import java.util.List;
 import uni.fmi.eventify.R;
 import uni.fmi.eventify.entity.Event;
 import uni.fmi.eventify.helper.Helper;
+import uni.fmi.eventify.ui.MainActivity;
+import uni.fmi.eventify.ui.ui.home.EventFragment;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder>{
 
     private List<Event> events;
-    private Context context;
+    private MainActivity activity;
 
-    public EventAdapter(Context context, List<Event> events){
-        this.context = context;
+    public EventAdapter(Activity activity, List<Event> events){
+        this.activity = (MainActivity) activity;
         this.events = events;
     }
 
@@ -56,16 +60,30 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
 
         holder.time.setText(Helper.convertLongAsTimeString(currentEvent.getCreatedAt()));
+
+        holder.buy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
+
+                transaction.replace(R.id.content_main, new EventFragment(events.get(holder.getAdapterPosition()).getId()));
+                transaction.commit();
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return events.size();
     }
 
     public void changeEvents(List<Event> currentEvents) {
         events.clear();
-        events.addAll(currentEvents);
+
+        for(Event e : currentEvents){
+            events.add(e);
+        }
         notifyDataSetChanged();
     }
 
